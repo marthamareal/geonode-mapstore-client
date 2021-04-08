@@ -35,13 +35,13 @@ import dimension from '@mapstore/framework/reducers/dimension';
 import playback from '@mapstore/framework/reducers/playback';
 import mapPopups from '@mapstore/framework/reducers/mapPopups';
 import catalog from '@mapstore/framework/reducers/catalog';
+import searchconfig from '@mapstore/framework/reducers/searchconfig';
 // end
 
 import MapView from '@js/routes/MapView';
 
 import gnresource from '@js/reducers/gnresource';
 import gnsettings from '@js/reducers/gnsettings';
-import gnlocaleEpics from '@js/epics/gnlocale';
 
 import { getConfiguration } from '@js/api/geonode/v2';
 
@@ -167,11 +167,11 @@ Promise.all([
                         playback,
                         mapPopups,
                         catalog,
+                        searchconfig,
                         ...pluginsDefinition.reducers
                     },
                     appEpics: {
                         ...standardEpics,
-                        ...gnlocaleEpics,
                         ...configEpics,
                         ...timelineEpics,
                         ...playbackEpics,
