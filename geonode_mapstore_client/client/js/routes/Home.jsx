@@ -23,6 +23,11 @@ import DetailsPanel from '@js/components/home/DetailsPanel';
 import FiltersMenu from '@js/components/home/FiltersMenu';
 import FilterForm from '@js/components/home/FilterForm';
 import LanguageSelector from '@js/components/home/LanguageSelector';
+import { getMonitoredState, handleExpression } from '@mapstore/framework/utils/PluginsUtils';
+import { getConfigProp } from "@mapstore/framework/utils/ConfigUtils";
+import { filterMenuItems, mapObjectFunc, reduceArrayRecursive, buildHrefByTemplate } from '@js/utils/MenuUtils';
+
+import get from 'lodash/get';
 import {
     fetchSuggestions,
     searchResources,
@@ -98,7 +103,7 @@ const CardGridWithMessageId = ({ query, user, isFirstRequest, ...props }) => {
             || isLoggedIn && 'noContentYet'
             || 'noPublicContent'
         : undefined;
-    return <CardGrid { ...props } messageId={messageId}/>;
+    return <CardGrid { ...props } messageId={messageId}  />;
 };
 
 const ConnectedCardGrid = connect(
@@ -189,10 +194,9 @@ function Home({
     onSearch,
     onToggleFilters,
     isToggle,
-    menu,
+    monitoredUserState,
+    geoNodeConfiguration,
     navbar,
-    cardsMenu,
-    footer,
     hideHero,
     isFilterForm,
     onSelect,
@@ -251,6 +255,12 @@ function Home({
         footerNodeHeight,
         heroNodeHeight
     };
+
+
+    const getMonitorState = (path) => {
+        return get(monitoredUserState, path);
+    };
+
 
     const [cardLayoutStyle, setCardLayoutStyle] = useLocalStorage('layoutCardsStyle');
     const [showFilterForm, setShowFilterForm] = useState( (isFilterForm && isToggle) || false);
@@ -318,9 +328,11 @@ function Home({
     // update all the information of filter in use on mount
     // to display the correct labels
     const [reRender, setReRender] = useState(0);
+
     const state = useRef(false);
     state.current = {
         query
+
     };
 
     useEffect(() => {
@@ -347,6 +359,17 @@ function Home({
 
 
     }, []);
+
+    const userState = {
+        user
+    };
+    const confWithHandleExpression = mapObjectFunc(v => handleExpression(getMonitorState, {}, v))(geoNodeConfiguration);
+    const menuItemsLeftAllowed = reduceArrayRecursive(confWithHandleExpression?.menu?.items, (item) => filterMenuItems(userState, item));
+    const menuItemsRightAllowed = reduceArrayRecursive(confWithHandleExpression?.menu?.rightItems, (item) => filterMenuItems(userState, item));
+    const navebarItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.navbar?.items, (item) => filterMenuItems(userState, item));
+    const filterMenuItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.cardsMenu?.items, (item) => filterMenuItems(userState, item));
+    const footerMenuItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.footer?.items, (item) => filterMenuItems(userState, item));
+    const cardOptionsItemsAllowed = reduceArrayRecursive(confWithHandleExpression?.cardOptions?.items, (item) => filterMenuItems(userState, item));
 
     const search = (
         <ConnectedSearchBar
@@ -376,10 +399,9 @@ function Home({
                         ...logo,
                         ...logo[pageSize]
                     }))}
-                navItems={navbar?.items}
+                navItems={navebarItemsAllowed}
                 inline={pageSize !== 'sm'}
                 pageSize={pageSize}
-                user={user}
                 style={{
                     ...theme?.navbar?.style,
                     width
@@ -405,10 +427,10 @@ function Home({
                     top: dimensions.brandNavbarHeight,
                     width
                 }}
-                user={user}
+                getMonitorState={getMonitorState}
                 query={query}
-                leftItems={menu?.items || menu?.leftItems}
-                rightItems={menu?.rightItems}
+                leftItems={menuItemsLeftAllowed || []}
+                rightItems={menuItemsRightAllowed || []}
                 formatHref={handleFormatHref}
                 tools={<ConnectedLanguageSelector
                     inline={theme?.languageSelector?.inline}
@@ -443,7 +465,9 @@ function Home({
                                 user={user}
                                 query={query}
                                 pageSize={pageSize}
+                                cardOptions={cardOptionsItemsAllowed}
                                 isColumnActive={!!resource}
+                                buildHrefByTemplate={buildHrefByTemplate}
                                 containerStyle={!isHeroVisible
                                     ? {
                                         marginTop: hideHero && dimensions.brandNavbarHeight,
@@ -488,7 +512,7 @@ function Home({
                                         top: dimensions.brandNavbarHeight + dimensions.menuIndexNodeHeight
                                     }}
                                     formatHref={handleFormatHref}
-                                    cardsMenu={cardsMenu?.items}
+                                    cardsMenu={filterMenuItemsAllowed || []}
                                     order={query?.sort}
                                     filters={queryFilters}
                                     onClear={handleClear}
@@ -496,7 +520,6 @@ function Home({
                                     layoutSwitcher={handleStoredLayoutStyle}
                                     orderOptions={filters?.order?.options}
                                     defaultLabelId={filters?.order?.defaultLabelId}
-                                    user={user}
                                 />
 
                             </ConnectedCardGrid>
@@ -508,7 +531,7 @@ function Home({
             </div>
             <Footer
                 ref={footerNode}
-                footerItems={footer.items}
+                footerItems={footerMenuItemsAllowed || []}
                 style={theme?.footer?.style}
             />
         </div>
@@ -535,18 +558,21 @@ Home.defaultProps = {
 
 const DEFAULT_PARAMS = {};
 
+
 const ConnectedHome = connect(
+
     createSelector([
         state => state?.gnsearch?.params || DEFAULT_PARAMS,
         state => state?.security?.user || null,
         state => state?.gnresource?.data || null,
-        state => state?.gnfiltersPanel?.isToggle || false
-    ], (params, user, resource, isToggle) => ({
+        state => state?.gnfiltersPanel?.isToggle || false,
+        state => getMonitoredState(state, getConfigProp('monitorState'))
+    ], (params, user, resource, isToggle, monitoredUserState) => ({
         params,
         user,
         resource,
-        isToggle
-
+        isToggle,
+        monitoredUserState
     })),
     {
         onSearch: searchResources,
