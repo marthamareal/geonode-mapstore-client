@@ -7,6 +7,7 @@
  */
 
 import get from 'lodash/get';
+import isNil from 'lodash/isNil';
 
 function inAllowedGroups(user, allowedRoles) {
     const groups = user?.info?.groups || [];
@@ -38,18 +39,18 @@ export function filterMenuItems(state, item, parent) {
         || isAuthenticated === false && !state?.user;
 }
 
+export const isValidBadgeValue = value => !!(value !== '' && !isNil(value));
 
-export const mapObjectFunc = Func => {
+export const mapObjectFunc = func => {
     const iter = value => value && typeof value === 'object'
         ? Array.isArray(value)
             ? value.map(iter)
-            : Object.fromEntries(Object.entries(value).map(([key, value]) => [key, iter(value, Func)]))
-        : Func(value);
+            : Object.fromEntries(Object.entries(value).map(([key, val]) => [key, iter(val, func)]))
+        : func(value);
     return iter;
 };
 
 export const reduceArrayRecursive = (arr, func) => {
-
     return arr && arr.reduce(
         (acc, item) => {
             const newItem = item;

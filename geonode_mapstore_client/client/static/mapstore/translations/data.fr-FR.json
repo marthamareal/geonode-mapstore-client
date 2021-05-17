@@ -29,6 +29,7 @@
             "remoteServices": "Services à distance",
             "maps": "Cartes",
             "map": "Carte",
+            "layer": "Couche",
             "geostory": "GeoStory",
             "createNew": "Créer un nouveau",
             "about": "À propos",
@@ -100,8 +101,10 @@
             "open": "Ouvert",
             "share": "Partager",
             "update": "Mettre à jour",
-            "delete": "Effacer"
-
+            "delete": "Effacer",
+            "customFiltersTitle": "Ressources",
+            "myResources": "Mes ressources",
+            "pendingApproval": "En attente de validation"
         }
     }
 }
