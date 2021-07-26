@@ -1,3 +1,4 @@
+{% load static %}
 {% load get_menu_json %}
 {% get_user_menu as USER_MENU %}
 
@@ -38,3 +39,19 @@
         </div>
     </div>
 </nav>
+
+{% block extra_script%}
+    <script src="{% static "lib/js/jquery.min.js" %}"></script>
+    <script src="{% static "lib/js/bootstrap.min.js" %}"></script>
+    <script type="text/javascript">
+        $(function () {
+            var signIn = document.getElementById("sign-in")
+            if(signIn){
+                var href = signIn.getAttribute("href");
+                var url_parts = window.location.href.split(window.location.pathname)
+                var path_name = encodeURIComponent(window.location.pathname + url_parts[url_parts.length-1])
+                signIn.setAttribute("href", href.slice(0, -1).concat(path_name))
+            }
+        });
+    </script>
+{% endblock extra_script %}
