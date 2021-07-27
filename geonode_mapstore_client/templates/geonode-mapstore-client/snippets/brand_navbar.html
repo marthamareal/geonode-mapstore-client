@@ -39,19 +39,27 @@
         </div>
     </div>
 </nav>
-
-{% block extra_script%}
+{% block extra_script %}
     <script src="{% static "lib/js/jquery.min.js" %}"></script>
     <script src="{% static "lib/js/bootstrap.min.js" %}"></script>
     <script type="text/javascript">
+        var signInElement = document.getElementById("sign-in")
         $(function () {
-            var signIn = document.getElementById("sign-in")
-            if(signIn){
-                var href = signIn.getAttribute("href");
+            manageUrlChange(signInElement)
+        });
+        $(window).bind('hashchange', function() {
+            manageUrlChange(signInElement)
+        });
+
+        function manageUrlChange(signInElement) {
+
+            if(signInElement){
+                var href = signInElement.getAttribute("href").split("next=")[0];
                 var url_parts = window.location.href.split(window.location.pathname)
                 var path_name = encodeURIComponent(window.location.pathname + url_parts[url_parts.length-1])
-                signIn.setAttribute("href", href.slice(0, -1).concat(path_name))
+                signInElement.setAttribute("href", href.concat("next=".concat(path_name)))
             }
-        });
+        }
+
     </script>
 {% endblock extra_script %}
