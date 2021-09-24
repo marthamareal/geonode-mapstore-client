@@ -61,10 +61,10 @@ class GeoNodeSerializer(object):
         _map_name = serializer.validated_data['title'] or map_obj.title
         _map_title = serializer.validated_data['title'] or map_obj.title
         _map_abstract = serializer.validated_data.get('abstract', '') or '' if not hasattr(map_obj, 'abstract') else map_obj.abstract
-        _data_blob = serializer.validated_data.get('blob')
 
         if data:
             try:
+                data_blob = serializer.validated_data.get('blob') or data.copy()
                 _map_conf = dict(data)
                 _map_conf["about"] = {
                     "name": _map_name,
@@ -199,7 +199,7 @@ class GeoNodeSerializer(object):
                     if not map_obj.uuid:
                         map_obj.uuid=str(uuid4())
 
-                    map_obj.blob = _data_blob
+                    map_obj.blob = data_blob
                     # Update GeoNode Map
                     _map_conf['map'] = _map_obj
 
