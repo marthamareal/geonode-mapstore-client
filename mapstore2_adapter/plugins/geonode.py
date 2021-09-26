@@ -261,7 +261,8 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                     ms2_map_data = json.loads(ms2_map_data)
                 if 'map' in ms2_map_data:
                     for _k, _v in ms2_map_data['map'].items():
-                        if _k not in data['map']:
+                        # add layers from mapstore eg annotations
+                        if _k not in data['map'] or _k == 'layers':
                             data['map'][_k] = ms2_map_data['map'][_k]
                     del ms2_map_data['map']
                 data.update(ms2_map_data)
