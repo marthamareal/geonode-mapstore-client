@@ -113,7 +113,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
         """
         # Initialization
         viewer_obj = json.loads(viewer)
-
+        data = {}
         map_id = None
         if 'id' in viewer_obj and viewer_obj['id']:
             try:
@@ -168,7 +168,6 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                 logger.debug(tb)
 
         else:
-            data = {}
             try:
                 # Map Definition
                 ms2_map = {}
