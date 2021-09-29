@@ -139,6 +139,16 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                 if isinstance(ms2_map_data, string_types):
                     ms2_map_data = json.loads(ms2_map_data)
                 data = ms2_map_data
+                backgrounds = self.getBackgrounds(data, MAP_BASELAYERS)
+                other_layers = []
+                if backgrounds:
+                    for layer in data['map']['layers']:
+                        if 'group' in layer and layer['group'] == "background":
+                            continue
+                        else:
+                            other_layers.append(layer)
+                    backgrounds.extend(other_layers)
+                    data['map']['layers'] = backgrounds
             except Exception:
                 # traceback.print_exc()
                 tb = traceback.format_exc()
@@ -177,7 +187,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                 ms2_map['maxExtent'] = viewer_obj['map']['maxExtent']
                 ms2_map['maxResolution'] = viewer_obj['map']['maxResolution']
 
-                # Backgrouns
+                # Backgrounds
                 backgrounds = self.getBackgrounds(viewer, MAP_BASELAYERS)
                 if backgrounds:
                     ms2_map['layers'] = backgrounds
@@ -219,21 +229,25 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
 
                     try:
                         # - extract from GeoNode guardian
-                        from geonode.layers.views import (_resolve_layer,
-                                                        _PERMISSION_MSG_MODIFY,
-                                                        _PERMISSION_MSG_DELETE)
-                        if _resolve_layer(request,
-                                        selected['name'],
-                                        'base.change_resourcebase',
-                                        _PERMISSION_MSG_MODIFY
-                                        ).user_can(request.user, 'base.change_resourcebase'):
+                        from geonode.layers.views import (
+                            _resolve_layer,
+                            _PERMISSION_MSG_MODIFY,
+                            _PERMISSION_MSG_DELETE
+                        )
+                        if _resolve_layer(
+                            request,
+                            selected['name'],
+                            'base.change_resourcebase',
+                            _PERMISSION_MSG_MODIFY
+                        ).user_can(request.user, 'base.change_resourcebase'):
                             info['canEdit'] = True
 
-                        if _resolve_layer(request,
-                                        selected['name'],
-                                        'base.delete_resourcebase',
-                                        _PERMISSION_MSG_DELETE
-                                        ).user_can(request.user, 'base.delete_resourcebase'):
+                        if _resolve_layer(
+                            request,
+                            selected['name'],
+                            'base.delete_resourcebase',
+                            _PERMISSION_MSG_DELETE
+                        ).user_can(request.user, 'base.delete_resourcebase'):
                             info['canDelete'] = True
                     except Exception:
                         tb = traceback.format_exc()
@@ -291,7 +305,9 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                 def_background = bg
                 break
         try:
-            viewer_obj = json.loads(viewer)
+            viewer_obj = viewer
+            if isinstance(viewer_obj, str):
+                viewer_obj = json.loads(viewer)
             layers = viewer_obj['map']['layers']
             for bg in backgrounds:
                 bg['visibility'] = False
