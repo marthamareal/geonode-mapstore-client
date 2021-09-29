@@ -211,7 +211,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
 
                 # Overlays
                 overlays, selected = self.get_overlays(viewer, request=request)
-                if selected and 'name' in selected and selected['name']:
+                if selected and 'name' in selected and selected['name'] and not map_id:
                     # We are generating a Layer Details View
                     center, zoom = self.get_center_and_zoom(viewer_obj['map'], selected)
                     ms2_map['center'] = center
@@ -219,21 +219,38 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
 
                     try:
                         # - extract from GeoNode guardian
-                        from geonode.layers.views import (
-                            _resolve_layer, _PERMISSION_MSG_MODIFY, _PERMISSION_MSG_DELETE)
-
-                        if _resolve_layer(
-                            request, selected['name'], 'change_resourcebase', _PERMISSION_MSG_MODIFY
-                        ).user_can(request.user, 'change_resourcebase'):
+                        from geonode.layers.views import (_resolve_layer,
+                                                        _PERMISSION_MSG_MODIFY,
+                                                        _PERMISSION_MSG_DELETE)
+                        if _resolve_layer(request,
+                                        selected['name'],
+                                        'base.change_resourcebase',
+                                        _PERMISSION_MSG_MODIFY
+                                        ).user_can(request.user, 'base.change_resourcebase'):
                             info['canEdit'] = True
 
-                        if _resolve_layer(
-                            request, selected['name'], 'delete_resourcebase', _PERMISSION_MSG_DELETE
-                        ).user_can(request.user, 'delete_resourcebase'):
+                        if _resolve_layer(request,
+                                        selected['name'],
+                                        'base.delete_resourcebase',
+                                        _PERMISSION_MSG_DELETE
+                                        ).user_can(request.user, 'base.delete_resourcebase'):
                             info['canDelete'] = True
                     except Exception:
                         tb = traceback.format_exc()
                         logger.debug(tb)
+                else:
+                    # We are getting the configuration of a Map
+                    # On GeoNode model the Map Center is always saved in 4326
+                    _x = get_valid_number(viewer_obj['map']['center'][0])
+                    _y = get_valid_number(viewer_obj['map']['center'][1])
+                    _crs = 'EPSG:4326'
+                    if _x > 360.0 or _x < -360.0:
+                        _crs = viewer_obj['map']['projection']
+                    ms2_map['center'] = {
+                        'x': _x,
+                        'y': _y,
+                        'crs': _crs
+                    }
 
                 for overlay in overlays:
                     if 'name' in overlay and overlay['name']:
