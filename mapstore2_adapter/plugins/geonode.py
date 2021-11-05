@@ -146,7 +146,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                         if 'group' in layer and layer['group'] == "background":
                             continue
                         else:
-                            layer['featureInfo'] = self.get_layer_featureInfo(layer)
+                            layer['featureInfo'] = self.get_layer_featureinfotemplate(layer)
                             other_layers.append(layer)
                     backgrounds.extend(other_layers)
                     data['map']['layers'] = backgrounds
@@ -452,7 +452,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                                 overlay['bbox']['crs'] = layer['srs'] if 'srs' in layer else \
                                     viewer_obj['map']['projection']
 
-                        overlay['featureInfo'] = self.get_layer_featureInfo(layer)
+                        overlay['featureInfo'] = self.get_layer_featureinfotemplate(layer)
                     elif 'name' in layer and layer['name'] == 'Annotations':
                         overlay = layer
 
@@ -557,7 +557,7 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
             viewer['map']['bbox'] = config_bbox
         return viewer
 
-    def get_layer_featureInfo(self, layer):
+    def get_layer_featureinfotemplate(self, layer):
         featureInfo = {}
         if 'ftInfoTemplate' in layer and layer['ftInfoTemplate']:
             featureInfo['format'] = 'TEMPLATE'
