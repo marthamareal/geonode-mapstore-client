@@ -140,16 +140,16 @@ class GeoNodeMapStore2ConfigConverter(BaseMapStore2ConfigConverter):
                     ms2_map_data = json.loads(ms2_map_data)
                 data = ms2_map_data
                 backgrounds = self.getBackgrounds(data, MAP_BASELAYERS)
-                other_layers = []
+                map_layers = []
                 if backgrounds:
-                    for layer in data['map']['layers']:
-                        if 'group' in layer and layer['group'] == "background":
-                            continue
-                        else:
-                            layer['featureInfo'] = self.get_layer_featureinfotemplate(layer)
-                            other_layers.append(layer)
-                    backgrounds.extend(other_layers)
-                    data['map']['layers'] = backgrounds
+                    map_layers.extend(backgrounds)
+                for layer in data['map']['layers']:
+                    if 'group' in layer and layer['group'] == "background":
+                        continue
+                    else:
+                        layer['featureInfo'] = self.get_layer_featureinfotemplate(layer)
+                        map_layers.append(layer)
+                data['map']['layers'] = map_layers
             except Exception:
                 # traceback.print_exc()
                 tb = traceback.format_exc()
