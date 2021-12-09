@@ -97,7 +97,7 @@ def get_base_right_topbar_menu(context):
                 "type": "link",
                 "href": "/groups/create/",
                 "label": "Create group"
-            }
+            }if user.is_superuser else None,
         ])
     return [about]
 
