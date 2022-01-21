@@ -49,10 +49,10 @@ def run_setup_hooks(*args, **kwargs):
     ]
 
 def connect_geoserver_style_visual_mode_signal():
-    from geonode.geoserver.signals import geoserver_style_visual_mode
+    from geonode.geoserver.signals import geoserver_automatic_default_style_set
     from geonode_mapstore_client.utils import set_default_style_to_open_in_visual_mode
 
-    geoserver_style_visual_mode.connect(set_default_style_to_open_in_visual_mode)
+    geoserver_automatic_default_style_set.connect(set_default_style_to_open_in_visual_mode)
 
 class AppConfig(BaseAppConfig):
 
