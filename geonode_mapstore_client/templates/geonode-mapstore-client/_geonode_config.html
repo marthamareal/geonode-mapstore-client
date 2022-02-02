@@ -42,7 +42,8 @@
         const defaultMapCenterY = geoNodeSettings.DEFAULT_MAP_CENTER_Y || 0;
         const defaultMapZoom = geoNodeSettings.DEFAULT_MAP_ZOOM || 0;
         const defaultTileSize = geoNodeSettings.DEFAULT_TILE_SIZE || 512;
-        const defaultMaxUploadSize = geoNodeSettings.DEFAULT_MAX_UPLOAD_SIZE || 104857600;
+        const datasetMaxUploadSize = geoNodeSettings.DATASET_MAX_UPLOAD_SIZE;
+        const documentMaxUploadSize = geoNodeSettings.DOCUMENT_MAX_UPLOAD_SIZE;
         const defaultLayerFormat = geoNodeSettings.DEFAULT_LAYER_FORMAT || 'image/png';
         const catalogueServices = geoNodeSettings.CATALOGUE_SERVICES || {};
         const catalogueSelectedService = geoNodeSettings.CATALOGUE_SELECTED_SERVICE || '';
@@ -90,8 +91,8 @@
                     timeEnabled: timeEnabled,
                     allowedDocumentTypes: allowedDocumentTypes,
                     isMobile: isMobile,
-                    dataset_upload_size: defaultMaxUploadSize,
-                    document_upload_size: defaultMaxUploadSize,
+                    dataset_upload_size: datasetMaxUploadSize,
+                    document_upload_size: documentMaxUploadSize,
                 },
                 geoNodeConfiguration: {
                     cardsMenu: {
