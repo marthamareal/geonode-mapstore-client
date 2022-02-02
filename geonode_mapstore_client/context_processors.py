@@ -11,7 +11,7 @@
 
 from django.conf import settings
 
-from geonode_mapstore_client.utils import get_max_upload_size
+from geonode.upload.utils import get_max_upload_size
 
 def resource_urls(request):
     """Global values to pass to templates"""
