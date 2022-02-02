@@ -10,18 +10,8 @@
 #########################################################################
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 
-from geonode.upload.models import UploadSizeLimit
-
-
-def get_max_upload_size(slug):
-    try:
-       max_size =  UploadSizeLimit.objects.get(slug=slug).max_size
-    except ObjectDoesNotExist:
-       max_size = getattr(settings, "DEFAULT_MAX_UPLOAD_SIZE", 104857600)
-    return max_size
-
+from geonode_mapstore_client.utils import get_max_upload_size
 
 def resource_urls(request):
     """Global values to pass to templates"""
