@@ -31,7 +31,7 @@ def resource_urls(request):
         'DATASET_MAX_UPLOAD_SIZE': get_max_upload_size("dataset_upload_size"),
         'DOCUMENT_MAX_UPLOAD_SIZE': get_max_upload_size("document_upload_size"),
         'DEFAULT_LAYER_FORMAT': getattr(settings, "DEFAULT_LAYER_FORMAT", 'image/png'),
-        'DEFAULT_MAX_PARALLEL_UPLOADS': get_max_upload_parallelism_limit("default_max_parallel_uploads"),
+        'MAX_PARALLEL_UPLOADS': get_max_upload_parallelism_limit("default_max_parallel_uploads"),
         'ALLOWED_DOCUMENT_TYPES': getattr(settings, "ALLOWED_DOCUMENT_TYPES", []),
         'LANGUAGES': getattr(settings, "LANGUAGES", []),
         'TRANSLATIONS_PATH': getattr(settings, "MAPSTORE_TRANSLATIONS_PATH", ['/static/mapstore/ms-translations', '/static/mapstore/gn-translations']),
